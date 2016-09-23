@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="Tracer.commands.trace"
+            name="Tracing">
+      </category>
+      <command
+            categoryId="Tracer.commands.trace"
+            id="Tracer.commands.On"
+            name="TraceOn">
+      </command>
+      <command
+            categoryId="Tracer.commands.trace"
+            id="Tracer.commands.Off"
+            name="TraceOff">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="tracer.handlers.Start"
+            commandId="Tracer.commands.On">
+      </handler>
+      <handler
+            class="tracer.handlers.Complete"
+            commandId="Tracer.commands.Off">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="Tracer.commands.On"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+6">
+      </key>
+      <key
+            commandId="Tracer.commands.Off"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+7">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.debug.ui.DebugView">
+         <command
+               commandId="Tracer.commands.On"
+               label="Trace on"
+               style="push">
+         </command>
+         <command
+               commandId="Tracer.commands.Off"
+               label="Trace off"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="org.eclipse.jdt.ui.java"
+            class="org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView"
+            icon="icons/SD.png"
+            id="tracer.sequenceDiagramView"
+            name="Java Sequence Diagram View"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.uml2SDLoader">
+      <uml2SDLoader
+            class="tracer.diagram.Uml2SDWriter"
+            default="true"
+            id="tracer.uml2sdwriter"
+            name="tracer.uml2sdwriter"
+            view="tracer.sequenceDiagramView">
+      </uml2SDLoader>
+   </extension>
+
+
+</plugin>
