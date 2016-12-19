@@ -20,6 +20,7 @@ import com.sun.jdi.VirtualMachine;
 import tracer.creation.TracingWizard;
 import tracer.creation.wizard.pages.datamodels.SelectionType;
 import tracer.trace.Listener;
+import tracer.trace.writers.TracerOnConsole;
 
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -90,7 +91,7 @@ public class Start extends AbstractHandler {
 				SelectionType selectionType = tracingWizard.getSelectionType();
 				Object[] selectedClasses = tracingWizard.getCheckedClasses();
 				IUml2SDLoader uml2SDLoader = LoadersManager.getInstance().getCurrentLoader(Start.TRACER_SEQUENCE_DIAGRAM_VIEW_ID);
-				Thread jdiEventRecorder = new Thread(new Listener(vm, selectionType, selectedClasses, threads));
+				Thread jdiEventRecorder = new Thread(new Listener(vm, selectionType, selectedClasses, threads, new TracerOnConsole()));
 				}
 			}							
 		return null;

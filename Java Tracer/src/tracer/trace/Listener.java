@@ -29,16 +29,19 @@ import com.sun.jdi.request.MethodExitRequest;
 import com.sun.jdi.request.ThreadDeathRequest;
 
 import tracer.creation.wizard.pages.datamodels.SelectionType;
+import tracer.trace.writers.IWriter;
 
 @SuppressWarnings("restriction")
 public class Listener implements Runnable {
 
-	public Listener(VirtualMachine vm, SelectionType selectionType, Object[] selectedClasses, IThread[] threads) {
+	private IWriter[] writers;
+	public Listener(VirtualMachine vm, SelectionType selectionType, Object[] selectedClasses, IThread[] threads, IWriter... writers) {
 		super();
 		this.vm = vm;
 		this.selectionType = selectionType;
 		this.selectedClasses = selectedClasses;
 		this.threads = threads;
+		this.writers = writers;
 	}
 	
 	void prepareClassesFiltering(EventRequest r)
@@ -233,12 +236,18 @@ public class Listener implements Runnable {
 
     // Forward event for thread specific processing
     private void methodEntryEvent(MethodEntryEvent event)  {
-         
+    	for (IWriter writer : writers)
+    	{
+    		writer.onMethodEntryEvent(event);
+    	}
     }
 
     // Forward event for thread specific processing
     private void methodExitEvent(MethodExitEvent event)  {
-         
+    	for (IWriter writer : writers)
+    	{
+    		writer.onMethodExitEvent(event);
+    	}
     }
 
     void threadDeathEvent(ThreadDeathEvent event)  {
