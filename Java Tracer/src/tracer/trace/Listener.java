@@ -4,11 +4,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.eclipse.debug.core.model.IThread;
+import org.eclipse.jdt.internal.debug.core.IJDIEventListener;
+import org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget;
 import org.eclipse.jdt.internal.debug.core.model.JDIThread;
 
+import com.sun.jdi.ClassType;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.ThreadReference;
-import com.sun.jdi.VMDisconnectedException;
 import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.event.Event;
 import com.sun.jdi.event.EventIterator;
@@ -29,10 +31,11 @@ import com.sun.jdi.request.MethodExitRequest;
 import com.sun.jdi.request.ThreadDeathRequest;
 
 import tracer.creation.wizard.pages.datamodels.SelectionType;
+import tracer.creation.wizard.pages.datamodels.containers.StaticTree.Item;
 import tracer.trace.writers.IWriter;
 
 @SuppressWarnings("restriction")
-public class Listener implements Runnable {
+public class Listener implements IJDIEventListener {
 
 	private IWriter[] writers;
 	public Listener(VirtualMachine vm, SelectionType selectionType, Object[] selectedClasses, IThread[] threads, IWriter... writers) {
@@ -48,11 +51,8 @@ public class Listener implements Runnable {
 	{
 		Method addClassFilterPattern = null;
 		Method addClassFilter = null;
-		try {
-			addClassFilterPattern = (selectionType == SelectionType.Excludes) ? 
-					r.getClass().getMethod("addClassExclusionFilter", String.class):
-			        r.getClass().getMethod("addClassFilter", String.class);
-					
+		try {			
+			addClassFilterPattern = r.getClass().getMethod("addClassExclusionFilter", String.class);
 			addClassFilter = r.getClass().getMethod("addClassFilter", ReferenceType.class);
 		} 
 		catch (NoSuchMethodException e) {
@@ -63,44 +63,27 @@ public class Listener implements Runnable {
 	
 		for (Object o : selectedClasses)
 		{
-			if (o instanceof String)
+			Item item = (Item) o;
+			if (item.get() instanceof ReferenceType)
 			{
-				String qualifiedName = (String) o;
-				try {
-					addClassFilterPattern.invoke(r, qualifiedName + ".*");
-				} catch (IllegalAccessException e) {
+				ReferenceType refType = (ReferenceType) (item.get());
+				try 
+				{
+				if (selectionType == SelectionType.Excludes)
+				{
+					addClassFilterPattern.invoke(r, refType.name());
+				}
+				else
+				{
+					addClassFilter.invoke(r, refType);
+				}
+				}
+				catch (IllegalAccessException e) {
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				} catch (InvocationTargetException e) {
 					e.printStackTrace();
-				}
-			}
-			else if (o instanceof ReferenceType)
-			{
-				if (selectionType == SelectionType.Excludes)
-				{
-					try {
-						addClassFilterPattern.invoke(r, ((ReferenceType) o).name());
-					} catch (IllegalAccessException e) {
-						e.printStackTrace();
-					} catch (IllegalArgumentException e) {
-						e.printStackTrace();
-					} catch (InvocationTargetException e) {
-						e.printStackTrace();
-					}						
-				}
-				else
-				{
-					try {
-						addClassFilter.invoke(r, (ReferenceType) o);
-					} catch (IllegalAccessException e) {
-						e.printStackTrace();
-					} catch (IllegalArgumentException e) {
-						e.printStackTrace();
-					} catch (InvocationTargetException e) {
-						e.printStackTrace();
-					}
 				}
 			}					
 		}
@@ -130,14 +113,8 @@ public class Listener implements Runnable {
 		}
 	}
 	
-	void setEventRequests() {
+	public void setEventRequests() {
         EventRequestManager mgr = vm.eventRequestManager();
-
-        // want all exceptions
-        ExceptionRequest excReq = mgr.createExceptionRequest(null, true, true);
-        // suspend so we can step
-        excReq.setSuspendPolicy(EventRequest.SUSPEND_ALL);
-        excReq.enable();
 
         MethodEntryRequest methodEntryRequest = mgr.createMethodEntryRequest();
         prepareClassesFiltering(methodEntryRequest);
@@ -148,6 +125,12 @@ public class Listener implements Runnable {
         prepareClassesFiltering(methodExitRequest);
         methodExitRequest.setSuspendPolicy(EventRequest.SUSPEND_NONE);
         methodExitRequest.enable();
+        
+        // want all exceptions
+        ExceptionRequest excReq = mgr.createExceptionRequest(null, true, true);
+        // suspend so we can step
+        excReq.setSuspendPolicy(EventRequest.SUSPEND_NONE);
+        excReq.enable();
 
         ThreadDeathRequest tdr = mgr.createThreadDeathRequest();
 		for (IThread thread : threads)
@@ -155,35 +138,19 @@ public class Listener implements Runnable {
 			JDIThread javaThread = (JDIThread) thread;
 			ThreadReference threadReference = javaThread.getUnderlyingThread();
 			tdr.addThreadFilter(threadReference);
+			javaThread.addJDIEventListener(this, methodEntryRequest);
+			javaThread.addJDIEventListener(this, methodExitRequest);
+			javaThread.addJDIEventListener(this, excReq);
+			javaThread.addJDIEventListener(this, tdr);
 		}
-        tdr.setSuspendPolicy(EventRequest.SUSPEND_ALL);
-        tdr.enable();        
+        tdr.setSuspendPolicy(EventRequest.SUSPEND_NONE);
+        tdr.enable();
         }
 	
-	@Override
-	public void run() {
-        EventQueue queue = vm.eventQueue();
-        while (connected) {
-            try {
-                EventSet eventSet = queue.remove();
-                EventIterator it = eventSet.eventIterator();
-                while (it.hasNext()) {
-                    handleEvent(it.nextEvent());
-                }
-                eventSet.resume();
-            } catch (InterruptedException exc) {
-                // Ignore
-            } catch (VMDisconnectedException discExc) {
-                handleDisconnectedException();
-                break;
-            }
-        }
-	}
-
     /**
      * Dispatch incoming events
      */
-    private void handleEvent(Event event) {
+    synchronized private void handleEvent(Event event) {
         if (event instanceof ExceptionEvent) {
             exceptionEvent((ExceptionEvent)event);
         } else if (event instanceof MethodEntryEvent) {
@@ -200,33 +167,6 @@ public class Listener implements Runnable {
             vmDisconnectEvent((VMDisconnectEvent)event);
         } else {
             throw new Error("Unexpected event type");
-        }
-    }
-
-    /***
-     * A VMDisconnectedException has happened while dealing with
-     * another event. We need to flush the event queue, dealing only
-     * with exit events (VMDeath, VMDisconnect) so that we terminate
-     * correctly.
-     */
-    synchronized void handleDisconnectedException() {
-        EventQueue queue = vm.eventQueue();
-        while (connected) {
-            try {
-                EventSet eventSet = queue.remove();
-                EventIterator iter = eventSet.eventIterator();
-                while (iter.hasNext()) {
-                    Event event = iter.nextEvent();
-                    if (event instanceof VMDeathEvent) {
-                        vmDeathEvent((VMDeathEvent)event);
-                    } else if (event instanceof VMDisconnectEvent) {
-                        vmDisconnectEvent((VMDisconnectEvent)event);
-                    }
-                }
-                eventSet.resume(); // Resume the VM
-            } catch (InterruptedException exc) {
-                // ignore
-            }
         }
     }
 
@@ -264,15 +204,9 @@ public class Listener implements Runnable {
     }
 
     public void vmDeathEvent(VMDeathEvent event) {
-        vmDied = true;
-       // writer.println("-- The application exited --");
     }
 
     public void vmDisconnectEvent(VMDisconnectEvent event) {
-        connected = false;
-        if (!vmDied) {
-          //  writer.println("-- The application has been disconnected --");
-        }
     }
 	
 	private VirtualMachine vm;	
@@ -280,6 +214,15 @@ public class Listener implements Runnable {
 	private Object[] selectedClasses;
 	private IThread[] threads;
 	
-	private boolean connected;
-	private boolean vmDied;
+	@Override
+	public boolean handleEvent(Event event, JDIDebugTarget target, boolean suspendVote, EventSet eventSet) {
+		handleEvent(event);
+		return true;
+	}
+
+	@Override
+	public void eventSetComplete(Event event, JDIDebugTarget target, boolean suspend, EventSet eventSet) {
+		// TODO Auto-generated method stub
+		
+	}
 }

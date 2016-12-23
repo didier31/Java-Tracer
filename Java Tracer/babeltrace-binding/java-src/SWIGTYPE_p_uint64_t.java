@@ -10,7 +10,7 @@
 public class SWIGTYPE_p_uint64_t {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_uint64_t(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  protected SWIGTYPE_p_uint64_t(long cPtr, boolean futureUse) {
     swigCPtr = cPtr;
   }
 

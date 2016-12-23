@@ -91,7 +91,8 @@ public class Start extends AbstractHandler {
 				SelectionType selectionType = tracingWizard.getSelectionType();
 				Object[] selectedClasses = tracingWizard.getCheckedClasses();
 				IUml2SDLoader uml2SDLoader = LoadersManager.getInstance().getCurrentLoader(Start.TRACER_SEQUENCE_DIAGRAM_VIEW_ID);
-				Thread jdiEventRecorder = new Thread(new Listener(vm, selectionType, selectedClasses, threads, new TracerOnConsole()));
+				Listener listener = new Listener(vm, selectionType, selectedClasses, threads, new TracerOnConsole());
+				listener.setEventRequests();
 				}
 			}							
 		return null;

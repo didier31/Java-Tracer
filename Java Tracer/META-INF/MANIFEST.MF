@@ -14,7 +14,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.databinding.property,
  org.eclipse.tracecompass.tmf.ui,
  org.eclipse.core.runtime,
- com.google.inject
+ com.google.inject,
+ org.eclipse.jdt.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
  swing2swt.jar

@@ -10,7 +10,7 @@
 public class SWIGTYPE_p_bt_ctf_field_type {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_bt_ctf_field_type(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  protected SWIGTYPE_p_bt_ctf_field_type(long cPtr, boolean futureUse) {
     swigCPtr = cPtr;
   }
 

@@ -10,7 +10,7 @@
 public class SWIGTYPE_p_bt_ctf_writer {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_bt_ctf_writer(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  protected SWIGTYPE_p_bt_ctf_writer(long cPtr, boolean futureUse) {
     swigCPtr = cPtr;
   }
 

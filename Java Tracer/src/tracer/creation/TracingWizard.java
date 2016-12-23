@@ -11,6 +11,8 @@ import tracer.creation.wizard.pages.datamodels.SelectionType;
 public class TracingWizard extends Wizard {
 
 	SelectClasses selectClassesPage; 
+	SelectionType selectionType = null;
+	Object[] checkedClasses = null;
 	
 	public TracingWizard(List<ReferenceType> loadedClasses) {
 		setWindowTitle("New Trace directive");
@@ -20,16 +22,28 @@ public class TracingWizard extends Wizard {
 	
 	public SelectionType getSelectionType()
 	{
-		return selectClassesPage.getSelectionType();
+		if (selectionType == null)
+		   return selectClassesPage.getSelectionType();
+		else
+			return selectionType;
 	}
 	
 	public Object[] getCheckedClasses()
 	{
-		return selectClassesPage.getCheckedClasses();
+		if (checkedClasses == null)
+		{
+		   return selectClassesPage.getCheckedClasses();
+		   /* Object[] checkedClasses = selectClassesPage.getCheckedClasses();
+		   return checkedClasses != null ? checkedClasses : new Object[0]; */
+		}
+		else
+			return checkedClasses;
 	}
 	
 	@Override
 	public boolean performFinish() {
+		selectionType = getSelectionType();
+		checkedClasses = getCheckedClasses();
 		return true;
 	}
 

@@ -28,7 +28,7 @@ public abstract class StaticTree {
 
 		@Override
 		public int compareTo(Item i) {
-			return ((Comparable) get()).compareTo((Comparable) i.get());
+			return ((Comparable<Comparable>) get()).compareTo((Comparable) i.get());
 		}			
 	}
 	
@@ -58,7 +58,7 @@ public abstract class StaticTree {
 					idx++;
 				}
 			}
-			return (Item[]) children.toArray(new Item[0]);
+			return children.toArray(new Item[0]);
 		}
 		else
 			return null;

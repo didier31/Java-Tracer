@@ -10,7 +10,7 @@
 public class SWIGTYPE_p_bt_ctf_clock {
   private transient long swigCPtr;
 
-  protected SWIGTYPE_p_bt_ctf_clock(long cPtr, @SuppressWarnings("unused") boolean futureUse) {
+  protected SWIGTYPE_p_bt_ctf_clock(long cPtr, boolean futureUse) {
     swigCPtr = cPtr;
   }
 
