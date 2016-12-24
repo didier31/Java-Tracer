@@ -17,6 +17,7 @@ import com.sun.jdi.Method;
 import com.sun.jdi.ObjectReference;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.StackFrame;
+import com.sun.jdi.ThreadReference;
 import com.sun.jdi.event.Event;
 import com.sun.jdi.event.ExceptionEvent;
 import com.sun.jdi.event.LocatableEvent;
@@ -28,7 +29,7 @@ public class TracerInSequenceDiagram implements IWriter {
 
 	private Frame frame;
 	
-	Hashtable<ReferenceType, Integer> lifelinesByType;
+	Hashtable<ReferenceType, Integer> lifelinesByType = new Hashtable<ReferenceType, Integer>();
 	
 	public TracerInSequenceDiagram(Frame frame) {
 		this.frame = frame; 
@@ -47,16 +48,45 @@ public class TracerInSequenceDiagram implements IWriter {
 	
 	protected int getCallerLifeline(LocatableEvent event)
 	{
-		Integer idx = lifelinesByType.get(getCaller(event).referenceType());
+		ReferenceType callerReferenceType = getCaller(event).referenceType(); 
+		Integer idx = lifelinesByType.get(callerReferenceType);
 		if (idx == null)
 		{
-			return createLifeline(event);
+			return createLifeline(callerReferenceType);
 		}
 		else
 		{
 			return idx;
 		}
 	}
+	
+/*	protected int getThreadLifeline(ThreadReference thread)
+	{
+		ReferenceType callerReferenceType = getCaller(event).referenceType(); 
+		Integer idx = lifelinesByType.get(callerReferenceType);
+		if (idx == null)
+		{
+			return createLifeline(callerReferenceType);
+		}
+		else
+		{
+			return idx;
+		}
+	}*/
+
+	protected int getCalleeLifeline(LocatableEvent event)
+	{
+		ReferenceType calleeReferenceType = getCallee(event).referenceType(); 
+		Integer idx = lifelinesByType.get(calleeReferenceType);
+		if (idx == null)
+		{
+			return createLifeline(calleeReferenceType);
+		}
+		else
+		{
+			return idx;
+		}
+	}	
 	
 	protected ObjectReference getCallee(LocatableEvent event)
 	{
@@ -68,15 +98,15 @@ public class TracerInSequenceDiagram implements IWriter {
 		}
 	}
 	
-	protected int createLifeline(LocatableEvent event)
+	protected int createLifeline(ReferenceType referenceType)
 	{
 		Lifeline callee = new Lifeline();
-		String name = getCallee(event).referenceType().name();
+		String name = referenceType.name();
 		int index = name.lastIndexOf('.');
 		name = name.substring(index);
 		callee.setName(name);
 		frame.addLifeLine(callee);
-		lifelinesByType.put(getCallee(event).referenceType(), frame.lifeLinesCount() - 1);
+		lifelinesByType.put(referenceType, frame.lifeLinesCount() - 1);
 		return frame.lifeLinesCount() - 1;
 	}
 	
@@ -86,9 +116,9 @@ public class TracerInSequenceDiagram implements IWriter {
 	ObjectReference callerReference = getCaller(event);
 	if (callerReference == null)
 		return;
-	int callerIdx = lifelinesByType.get(callerReference.referenceType());
+	int callerIdx = getCallerLifeline(event);
 	Lifeline caller = frame.getLifeline(callerIdx);
-	int calleeIdx = createLifeline(event);
+	int calleeIdx = getCalleeLifeline(event);
 	Lifeline callee = frame.getLifeline(calleeIdx);
 	
 	SyncMessage call = new SyncMessage();
