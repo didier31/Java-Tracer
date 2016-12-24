@@ -20,11 +20,13 @@ import com.sun.jdi.VirtualMachine;
 import tracer.creation.TracingWizard;
 import tracer.creation.wizard.pages.datamodels.SelectionType;
 import tracer.trace.Listener;
+import tracer.trace.writers.TracerInSequenceDiagram;
 import tracer.trace.writers.TracerOnConsole;
 
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Frame;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.IUml2SDLoader;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.LoadersManager;
 
@@ -90,8 +92,11 @@ public class Start extends AbstractHandler {
 			{
 				SelectionType selectionType = tracingWizard.getSelectionType();
 				Object[] selectedClasses = tracingWizard.getCheckedClasses();
-				IUml2SDLoader uml2SDLoader = LoadersManager.getInstance().getCurrentLoader(Start.TRACER_SEQUENCE_DIAGRAM_VIEW_ID);
-				Listener listener = new Listener(vm, selectionType, selectedClasses, threads, new TracerOnConsole());
+				//IUml2SDLoader uml2SDLoader = LoadersManager.getInstance().getCurrentLoader(Start.TRACER_SEQUENCE_DIAGRAM_VIEW_ID);
+				sdView.setFrame(new Frame());
+				Listener listener = new Listener(vm, selectionType, selectedClasses, threads,
+						                         new TracerOnConsole(),
+						                         new TracerInSequenceDiagram(sdView.getFrame()));
 				listener.setEventRequests();
 				}
 			}							

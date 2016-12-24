@@ -3,6 +3,7 @@ package tracer.trace;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.jdt.internal.debug.core.IJDIEventListener;
 import org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget;
@@ -118,12 +119,12 @@ public class Listener implements IJDIEventListener {
 
         MethodEntryRequest methodEntryRequest = mgr.createMethodEntryRequest();
         prepareClassesFiltering(methodEntryRequest);
-        methodEntryRequest.setSuspendPolicy(EventRequest.SUSPEND_NONE);
+        methodEntryRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
         methodEntryRequest.enable();
 
         MethodExitRequest methodExitRequest = mgr.createMethodExitRequest();
         prepareClassesFiltering(methodExitRequest);
-        methodExitRequest.setSuspendPolicy(EventRequest.SUSPEND_NONE);
+        methodExitRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
         methodExitRequest.enable();
         
         // want all exceptions
