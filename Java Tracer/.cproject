@@ -14,9 +14,6 @@
 					<extension id="org.eclipse.cdt.core.Cygwin_PE" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -24,53 +21,27 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.cygwin.so.debug.605643487." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cygwin.base.231119856" name="Cygwin GCC" superClass="cdt.managedbuild.toolchain.gnu.cygwin.base" unusedChildren="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.base;cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.Cygwin_PE" id="cdt.managedbuild.target.gnu.platform.cygwin.base.1852296634" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.cygwin.base"/>
-							<builder buildPath="${workspace_loc:/Java-Tracer}/Debug" id="cdt.managedbuild.target.gnu.builder.base.300445402" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<builder buildPath="${workspace_loc:/Java-Tracer}/Debug" id="org.eclipse.cdt.build.core.internal.builder.970281147" parallelBuildOn="true" parallelizationNumber="optimal" superClass="org.eclipse.cdt.build.core.internal.builder"/>
 							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" id="cdt.managedbuild.tool.gnu.assembler.cygwin.base.309213654" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.cygwin.base">
-								<option id="gnu.both.asm.option.include.paths.763831218" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath"/>
+								<option id="gnu.both.asm.option.include.paths.763831218" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1292644334" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.cygwin.base.913947882" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.cygwin.base"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.cygwin.base.118237419" name="Cygwin C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.cygwin.base">
-								<option defaultValue="true" id="gnu.c.link.option.shared.786401075" name="Shared (-shared)" superClass="gnu.c.link.option.shared" valueType="boolean"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.276712533" name="Cygwin C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin">
-								<option id="gnu.cpp.compiler.option.optimization.level.1449044865" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.debugging.level.672035078" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin.736754473" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin"/>
-							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.cygwin.base.2134183019" name="Cygwin C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.cygwin.base">
 								<option id="gnu.c.compiler.option.include.paths.1809325284" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/babeltrace/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Program Files\Java\jdk1.8.0_102\include\win32&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CYGWIN_HOME}/usr/include/glib-2.0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${JAVA_HOME}\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CYGWIN_HOME}/lib/glib-2.0/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${JAVA_HOME}\include\win32&quot;"/>
 								</option>
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1885087968" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.816948183" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.dialect.std.223832639" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.1525194322" superClass="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.1209900446" name="Cygwin C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.cygwin">
-								<option defaultValue="true" id="gnu.cpp.link.option.shared.126747571" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" valueType="boolean"/>
-								<option id="gnu.cpp.link.option.libs.75527056" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="babeltrace-ctf"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="babeltrace"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="compat"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="glib-2.0"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="intl"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="uuid.dll"/>
-								</option>
-								<option id="gnu.cpp.link.option.paths.1705581190" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/babeltrace/lib/.libs/}&quot;"/>
-									<listOptionValue builtIn="false" value="C:/cygwin64/lib"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/babeltrace/formats/ctf/.libs/}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/babeltrace/compat/.libs}&quot;"/>
-								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1646421406" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.cygwin.base.118237419" name="Cygwin C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.cygwin.base">
+								<option defaultValue="true" id="gnu.c.link.option.shared.786401075" name="Shared (-shared)" superClass="gnu.c.link.option.shared" valueType="boolean"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
@@ -97,7 +68,6 @@
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -107,54 +77,25 @@
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.Cygwin_PE" id="cdt.managedbuild.target.gnu.platform.cygwin.base.179314898" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.cygwin.base"/>
 							<builder buildPath="${workspace_loc:/Java-Tracer}/Release" id="cdt.managedbuild.target.gnu.builder.cygwin.base.140572621" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.cygwin.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.cygwin.base.677801048" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.cygwin.base">
-								<option id="gnu.both.asm.option.include.paths.1117388531" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath"/>
+								<option id="gnu.both.asm.option.include.paths.1117388531" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1499131374" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.cygwin.base.511110296" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.cygwin.base"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.cygwin.base.60418307" name="Cygwin C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.cygwin.base">
-								<option defaultValue="true" id="gnu.c.link.option.shared.413064569" name="Shared (-shared)" superClass="gnu.c.link.option.shared" valueType="boolean"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.1363863290" name="Cygwin C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin">
-								<option id="gnu.cpp.compiler.option.optimization.level.1452322249" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.debugging.level.1039261494" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin.1469530673" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin"/>
-							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.cygwin.base.1768494234" name="Cygwin C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.cygwin.base">
 								<option id="gnu.c.compiler.option.include.paths.1275762781" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/babeltrace/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Program Files\Java\jdk1.8.0_102\include\win32&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CYGWIN_HOME}/usr/include/glib-2.0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${JAVA_HOME}\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CYGWIN_HOME}/usr/lib/glib-2.0/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${JAVA_HOME}\include\win32&quot;"/>
 								</option>
 								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.1203094700" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.190433262" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.dialect.std.1747002236" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.2003649654" superClass="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.235655481" name="Cygwin C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.cygwin">
-								<option defaultValue="true" id="gnu.cpp.link.option.shared.967218334" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" valueType="boolean"/>
-								<option id="gnu.cpp.link.option.libs.1465241467" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="babeltrace-ctf"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="babeltrace"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="ctf-writer"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="glib-2.0"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="intl"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="compat"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="uuid.dll"/>
-								</option>
-								<option id="gnu.cpp.link.option.paths.958546226" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;C:\cygwin64\lib\&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/babeltrace/lib/.libs/}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/babeltrace/formats/ctf/writer/.libs/}&quot;"/>
-									<listOptionValue builtIn="false" value="C:/cygwin64/lib"/>
-									<listOptionValue builtIn="false" value="/babeltrace/formats/ctf/.libs/"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/babeltrace/compat/.libs}&quot;"/>
-								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1675889930" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.cygwin.base.60418307" name="Cygwin C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.cygwin.base">
+								<option defaultValue="true" id="gnu.c.link.option.shared.413064569" name="Shared (-shared)" superClass="gnu.c.link.option.shared" valueType="boolean"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
