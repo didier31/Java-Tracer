@@ -16,23 +16,9 @@ import com.sun.jdi.event.ThreadDeathEvent;
 public class TracerOnConsole implements IWriter {
 
 	@Override
-	public void onMethodEntryEvent(MethodEntryEvent event) {
-		Method method = event.method();
-		List<StackFrame> frames = null;
-		try {
-			frames = event.thread().frames();
-		} catch (IncompatibleThreadStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		List<LocalVariable> vars = null;
-		try {
-			vars = frames.get(0).visibleVariables();
-		} catch (AbsentInformationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+	public void onMethodEntryEvent(MethodEntryEvent event) 
+	{
+		Method method = event.method();		
 		System.out.println("---> " + printMethod(method));
 	}
 
@@ -65,10 +51,10 @@ public class TracerOnConsole implements IWriter {
 	}
 	
 	@Override
-	public void onMethodExitEvent(MethodExitEvent event) {
+	public void onMethodExitEvent(MethodExitEvent event) 
+	{
 		Method method = event.method();
-		System.out.print("<--- ");
-		printMethod(method);		
+		System.out.println("<--- " + printMethod(method));		
 	}
 
 	@Override
