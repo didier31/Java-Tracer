@@ -7,10 +7,13 @@ import java.util.List;
 import java.util.Stack;
 
 import javax.naming.Reference;
+import javax.sql.rowset.spi.SyncResolver;
 
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.ExecutionOccurrence;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Frame;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Lifeline;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.SyncMessage;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.SyncMessageReturn;
 
 import com.google.inject.spi.Message;
 import com.sun.jdi.AbsentInformationException;
@@ -34,13 +37,45 @@ public class TracerInSequenceDiagram implements IWriter {
 	
 	Hashtable<ReferenceType, Integer> lifelinesByType = new Hashtable<ReferenceType, Integer>();
 	
-	Hashtable<ThreadReference, Stack<SyncMessage>> callStacks = new Hashtable<ThreadReference, Stack<SyncMessage>>(); 
+	class CallStacks
+	{
+		Hashtable<ThreadReference, Stack<SyncMessage>> callStacks = new Hashtable<ThreadReference, Stack<SyncMessage>>();
+		
+		public void push(ThreadReference thread, SyncMessage message)
+		{
+			Stack<SyncMessage> stack = callStacks.get(thread);
+			if (stack == null)
+			{
+				stack = new Stack<SyncMessage>();
+				SyncMessage launchMessage = new SyncMessage();
+				Lifeline launcher = frame.getLifeline(JVMLauncher);
+				launchMessage.autoSetStartLifeline(launcher);
+				launchMessage.autoSetEndLifeline(message.getStartLifeline());
+				stack.push(launchMessage);
+				callStacks.put(thread, stack);
+			}
+			stack.push(message);
+		}
+		
+		public SyncMessage pop(ThreadReference thread)
+		{
+			Stack<SyncMessage> stack = callStacks.get(thread);
+			return stack.pop();
+		}
+	};
+	
+	CallStacks callStacks = new CallStacks(); 
 
 	private int JVMLauncher = -1;
 	
-	public TracerInSequenceDiagram(Frame frame) {
+	public TracerInSequenceDiagram(Frame frame) 
+	{
 		this.frame = frame;
-	}	
+		Lifeline launcher = new Lifeline();
+		launcher.setName("<JVM's Launcher>");
+		frame.addLifeLine(launcher);
+		JVMLauncher = frame.lifeLinesCount() - 1;
+	}		
 	
 	protected ReferenceType getCaller(LocatableEvent event)
 	{
@@ -55,8 +90,8 @@ public class TracerInSequenceDiagram implements IWriter {
 			{
 				return null;
 			}
-		} catch (IncompatibleThreadStateException e) {
-			// TODO Auto-generated catch block
+		} catch (IncompatibleThreadStateException e) 
+		{
 			e.printStackTrace();
 			referenceType = null;
 		}
@@ -81,17 +116,7 @@ public class TracerInSequenceDiagram implements IWriter {
 		}
 		else
 		{
-			if (JVMLauncher  == -1)
-			{
-				Lifeline callee = new Lifeline();
-				callee.setName("<JVM's Launcher>");
-				frame.addLifeLine(callee);
-				return frame.lifeLinesCount() - 1;
-			}
-			else
-			{
-				return JVMLauncher;
-			}
+			return JVMLauncher;
 		}
 	}
 	
@@ -126,7 +151,7 @@ public class TracerInSequenceDiagram implements IWriter {
 		return frame.lifeLinesCount() - 1;
 	}
 	
-	protected void addMethodEventMessage(LocatableEvent event)
+	public void onMethodEntryEvent(MethodEntryEvent event)
 	{
 		int callerIdx = getCallerLifeline(event);
 		Lifeline caller = frame.getLifeline(callerIdx);
@@ -135,39 +160,31 @@ public class TracerInSequenceDiagram implements IWriter {
 		
 		SyncMessage call = new SyncMessage();
 		
-		int stackDeepness = -1;
-		try {
-			stackDeepness = event.thread().frames().size();
-		} catch (IncompatibleThreadStateException e) {
-		}
-		
-		if (event instanceof MethodEntryEvent)
-		{
-			call.autoSetStartLifeline(caller);
-			call.autoSetEndLifeline(callee);
-			MethodEntryEvent evt = (MethodEntryEvent) event;
-			call.setName(stackDeepness + ": " + printMethod(evt.method()));
-		}
-		else
-		{
-			call.autoSetStartLifeline(callee);
-			call.autoSetEndLifeline(caller);
-			MethodExitEvent evt = (MethodExitEvent) event;
-			call.setName(stackDeepness + ": return " + evt.method().returnTypeName());
-		}
+		call.autoSetStartLifeline(caller);
+		call.autoSetEndLifeline(callee);
+		MethodEntryEvent evt = (MethodEntryEvent) event;
+		call.setName(printMethod(evt.method()));
+		callStacks.push(event.thread(), call);
 		frame.addMessage(call);
-	}
-	
-	@Override
-	public void onMethodEntryEvent(MethodEntryEvent event)
-	{
-		addMethodEventMessage(event);
 	}
 
 	@Override
 	public void onMethodExitEvent(MethodExitEvent event) 
 	{
-		addMethodEventMessage(event);
+		SyncMessage call = callStacks.pop(event.thread());
+		SyncMessageReturn returnMessage = new SyncMessageReturn();
+		
+		returnMessage.autoSetStartLifeline(call.getEndLifeline());
+		returnMessage.autoSetEndLifeline(call.getStartLifeline());
+		returnMessage.setName(event.method().returnTypeName());
+		
+		frame.addMessage(returnMessage);
+		
+        ExecutionOccurrence execution = new ExecutionOccurrence();
+        execution.setStartOccurrence(call.getEventOccurrence());
+        execution.setEndOccurrence(returnMessage.getEventOccurrence());
+        call.getEndLifeline().addExecution(execution);
+        execution.setName(event.method().name());
 	}
 
 	@Override
