@@ -1,30 +1,25 @@
 package tracer.trace.writers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Stack;
-
-import javax.naming.Reference;
-import javax.sql.rowset.spi.SyncResolver;
+import java.util.Vector;
 
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.ExecutionOccurrence;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Frame;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Lifeline;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.LifelineCategories;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.SyncMessage;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.SyncMessageReturn;
 
-import com.google.inject.spi.Message;
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.IncompatibleThreadStateException;
 import com.sun.jdi.LocalVariable;
 import com.sun.jdi.Method;
-import com.sun.jdi.ObjectReference;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.StackFrame;
 import com.sun.jdi.ThreadReference;
-import com.sun.jdi.event.Event;
 import com.sun.jdi.event.ExceptionEvent;
 import com.sun.jdi.event.LocatableEvent;
 import com.sun.jdi.event.MethodEntryEvent;
@@ -36,6 +31,8 @@ public class TracerInSequenceDiagram implements IWriter {
 	private Frame frame;
 	
 	Hashtable<ReferenceType, Integer> lifelinesByType = new Hashtable<ReferenceType, Integer>();
+	Vector<LifelineCategories> lifeLineCategories = new Vector<LifelineCategories>();
+	Hashtable<ThreadReference, Integer> categorieByThread = new Hashtable<ThreadReference, Integer>();
 	
 	class CallStacks
 	{
@@ -139,6 +136,20 @@ public class TracerInSequenceDiagram implements IWriter {
 		return event.location().declaringType();
 	}
 	
+	protected int getCategory(ThreadReference thread)
+	{
+		if (!categorieByThread.containsKey(thread))
+		{
+			LifelineCategories category = new LifelineCategories();
+			category.setName(thread.name());
+			lifeLineCategories.add(category);
+			categorieByThread.put(thread, lifeLineCategories.size() - 1);
+			frame.setLifelineCategories(lifeLineCategories.toArray(new LifelineCategories[0]));
+		}
+	return categorieByThread.get(thread);
+	}
+	
+	
 	protected int createLifeline(ReferenceType referenceType)
 	{
 		Lifeline callee = new Lifeline();
@@ -147,7 +158,7 @@ public class TracerInSequenceDiagram implements IWriter {
 		name = name.substring(index+1);
 		callee.setName(name);
 		frame.addLifeLine(callee);
-		lifelinesByType.put(referenceType, frame.lifeLinesCount() - 1);
+		lifelinesByType.put(referenceType, frame.lifeLinesCount() - 1);		
 		return frame.lifeLinesCount() - 1;
 	}
 	
@@ -157,6 +168,7 @@ public class TracerInSequenceDiagram implements IWriter {
 		Lifeline caller = frame.getLifeline(callerIdx);
 		int calleeIdx = getCalleeLifeline(event);
 		Lifeline callee = frame.getLifeline(calleeIdx);
+		callee.setCategory(getCategory(event.thread()));
 		
 		SyncMessage call = new SyncMessage();
 		
