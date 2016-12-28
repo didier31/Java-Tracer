@@ -28,8 +28,6 @@ public class TracerOnConsole implements IWriter {
 		try {
 			listParams = method.arguments();
 		} catch (AbsentInformationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			return "";
 		}
 		String call;

@@ -10,6 +10,10 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget;
 import org.eclipse.jdt.internal.debug.core.model.JDIStackFrame;
 import org.eclipse.jdt.internal.debug.core.model.JDIThread;
+import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Frame;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -22,13 +26,6 @@ import tracer.creation.wizard.pages.datamodels.SelectionType;
 import tracer.trace.Listener;
 import tracer.trace.writers.TracerInSequenceDiagram;
 import tracer.trace.writers.TracerOnConsole;
-
-import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView;
-import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Frame;
-import org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.IUml2SDLoader;
-import org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.LoadersManager;
 
 /**
  * Our sample handler extends AbstractHandler, an IHandler base class.

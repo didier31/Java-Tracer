@@ -3,19 +3,15 @@ package tracer.trace;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.jdt.internal.debug.core.IJDIEventListener;
 import org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget;
 import org.eclipse.jdt.internal.debug.core.model.JDIThread;
 
-import com.sun.jdi.ClassType;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.ThreadReference;
 import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.event.Event;
-import com.sun.jdi.event.EventIterator;
-import com.sun.jdi.event.EventQueue;
 import com.sun.jdi.event.EventSet;
 import com.sun.jdi.event.ExceptionEvent;
 import com.sun.jdi.event.MethodEntryEvent;
@@ -130,7 +126,7 @@ public class Listener implements IJDIEventListener {
         // want all exceptions
         ExceptionRequest excReq = mgr.createExceptionRequest(null, true, true);
         // suspend so we can step
-        excReq.setSuspendPolicy(EventRequest.SUSPEND_NONE);
+        excReq.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
         excReq.enable();
 
         ThreadDeathRequest tdr = mgr.createThreadDeathRequest();
@@ -198,10 +194,12 @@ public class Listener implements IJDIEventListener {
     }
 
 
-    private void exceptionEvent(ExceptionEvent event) {
-//        if (trace != null) {  // only want threads we care about
-//            trace.exceptionEvent(event);      // Forward event
-//        }
+    private void exceptionEvent(ExceptionEvent event) 
+    {
+    	for (IWriter writer : writers)
+    	{
+    		writer.onExceptionEvent(event);
+    	}
     }
 
     public void vmDeathEvent(VMDeathEvent event) {

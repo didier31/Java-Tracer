@@ -16,6 +16,7 @@ import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.SyncMessageReturn;
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.IncompatibleThreadStateException;
 import com.sun.jdi.LocalVariable;
+import com.sun.jdi.Location;
 import com.sun.jdi.Method;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.StackFrame;
@@ -59,6 +60,11 @@ public class TracerInSequenceDiagram implements IWriter {
 			Stack<SyncMessage> stack = callStacks.get(thread);
 			return stack.pop();
 		}
+		
+	    public int size(ThreadReference thread)
+	    {
+	    	return callStacks.size();
+	    }
 	};
 	
 	CallStacks callStacks = new CallStacks(); 
@@ -177,6 +183,13 @@ public class TracerInSequenceDiagram implements IWriter {
 		MethodEntryEvent evt = (MethodEntryEvent) event;
 		call.setName(printMethod(evt.method()));
 		callStacks.push(event.thread(), call);
+		int frameStackSize = -1;
+		try {
+			frameStackSize = event.thread().frameCount();
+		} catch (IncompatibleThreadStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		frame.addMessage(call);
 	}
 
@@ -207,8 +220,66 @@ public class TracerInSequenceDiagram implements IWriter {
 
 	@Override
 	public void onExceptionEvent(ExceptionEvent event) {
-		// TODO Auto-generated method stub
+		ReferenceType fromReferenceType = event.location().declaringType();
+		if (!lifelinesByType.containsKey(fromReferenceType))
+			return;
+		int fromLifelineIdx = lifelinesByType.get(fromReferenceType);
+				
+		Location toLocation = event.catchLocation();
 
+		int toLifelineIdx;
+		
+		if (toLocation == null)
+		{
+			toLifelineIdx = JVMLauncher;
+		}
+		else
+		{
+			ReferenceType catchingRefType = event.catchLocation().declaringType();
+			if (!lifelinesByType.containsKey(catchingRefType))
+				return;
+			toLifelineIdx = lifelinesByType.get(catchingRefType);			
+		}
+		
+		SyncMessageReturn exceptionMessage = new SyncMessageReturn();
+		exceptionMessage.autoSetStartLifeline(frame.getLifeline(fromLifelineIdx));
+		exceptionMessage.autoSetEndLifeline(frame.getLifeline(toLifelineIdx));
+		exceptionMessage.setName(event.exception().referenceType().name());		
+		frame.addMessage(exceptionMessage);
+		
+	// Unstack method calls and marks them 'terminated' in SD.
+		int frameCount = 0;
+		try 
+		{
+			frameCount = event.thread().frameCount();
+		} 
+		catch (IncompatibleThreadStateException e1) 
+		{
+		}
+		int frameIdx = 0;
+		String catchMethodSignature = event.catchLocation() != null ? event.catchLocation().method().signature() : null;
+		boolean notFound = true;
+		
+		while (notFound && callStacks.size(event.thread()) > 0 && frameIdx < frameCount)
+		{				
+	        try 
+	        {
+				notFound = !event.thread().frame(frameIdx).location().method().signature().equals(catchMethodSignature);
+			} 
+	        catch (IncompatibleThreadStateException e) 
+	        {
+			}
+	        if (notFound)
+	        {
+	        	SyncMessage call = callStacks.pop(event.thread());
+	        	ExecutionOccurrence execution = new ExecutionOccurrence();
+	        	execution.setStartOccurrence(call.getEventOccurrence());
+	        	execution.setEndOccurrence(exceptionMessage.getEventOccurrence());
+	        	call.getEndLifeline().addExecution(execution);
+	        	execution.setName(call.getName());
+	        }
+	        frameIdx++;
+		}
 	}
 
 	String printMethod(Method method)
@@ -219,7 +290,7 @@ public class TracerInSequenceDiagram implements IWriter {
 		} catch (AbsentInformationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return "";
+			return "()";
 		}
 		String call;
 		call = method.declaringType().name() + "." + method.name() +"(";
