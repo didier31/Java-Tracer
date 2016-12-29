@@ -196,20 +196,23 @@ public class TracerInSequenceDiagram implements IWriter {
 	@Override
 	public void onMethodExitEvent(MethodExitEvent event) 
 	{
-		SyncMessage call = callStacks.pop(event.thread());
-		SyncMessageReturn returnMessage = new SyncMessageReturn();
+		if (callStacks.size(event.thread()) > 0)
+		{
+			SyncMessage call = callStacks.pop(event.thread());
+			SyncMessageReturn returnMessage = new SyncMessageReturn();
+			
+			returnMessage.autoSetStartLifeline(call.getEndLifeline());
+			returnMessage.autoSetEndLifeline(call.getStartLifeline());
+			returnMessage.setName(event.method().returnTypeName());
 		
-		returnMessage.autoSetStartLifeline(call.getEndLifeline());
-		returnMessage.autoSetEndLifeline(call.getStartLifeline());
-		returnMessage.setName(event.method().returnTypeName());
+			frame.addMessage(returnMessage);
 		
-		frame.addMessage(returnMessage);
-		
-        ExecutionOccurrence execution = new ExecutionOccurrence();
-        execution.setStartOccurrence(call.getEventOccurrence());
-        execution.setEndOccurrence(returnMessage.getEventOccurrence());
-        call.getEndLifeline().addExecution(execution);
-        execution.setName(event.method().name());
+			ExecutionOccurrence execution = new ExecutionOccurrence();
+			execution.setStartOccurrence(call.getEventOccurrence());
+			execution.setEndOccurrence(returnMessage.getEventOccurrence());
+			call.getEndLifeline().addExecution(execution);
+			execution.setName(event.method().name());
+		}
 	}
 
 	@Override
